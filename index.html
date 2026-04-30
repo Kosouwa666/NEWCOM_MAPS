@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Recherche GPS</title>
+</head>
+<body>
+  <h1>Recherche de site GPS</h1>
+
+  <input id="search" placeholder="Code du site">
+  <button onclick="go()">Afficher sur Google Maps</button>
+
+  <script>
+    async function go() {
+      const code = document.getElementById("search").value.trim().toUpperCase();
+
+      if (code === "SITE001") {
+        const lat = -20.882;
+        const lng = 55.450;
+        const url = `https://www.google.com/maps?q=${lat},${lng}`;
+        window.open(url, "_blank");
+      } else {
+        alert("Code inconnu (pour l'instant je ne connais que SITE001)");
+      }
+    }
+  </script>
+</body>
+</html>
