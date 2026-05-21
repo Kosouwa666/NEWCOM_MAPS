@@ -138,6 +138,7 @@ document.getElementById("search").addEventListener("input", async function() {
 function selectSuggestion(code) {
     document.getElementById("search").value = code;
     document.getElementById("suggestions").style.display = "none";
+    searchSite(); // Lance automatiquement la recherche
 }
 
 // Recherche + affichage des boutons
