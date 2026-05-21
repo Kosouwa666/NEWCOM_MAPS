@@ -18,26 +18,49 @@
 <script>
 // Fonction pour lire le CSV
 async function loadCSV() {
-    const response = await fetch('sites.csv');
-    const text = await response.text();
-    const rows = text.split('\n').map(r => r.trim()).filter(r => r.length > 0);
+    try {
+        const response = await fetch('sites.csv');
+        if (!response.ok) {
+            alert("Erreur de chargement du fichier sites.csv : " + response.status);
+            return [];
+        }
 
-    const data = rows.slice(1).map(row => {
-        const [code, lat, lng] = row.split(';');
-        return { code: code.trim(), lat: lat.trim(), lng: lng.trim() };
-    });
+        const text = await response.text();
+        const rows = text.split('\n').map(r => r.trim()).filter(r => r.length > 0);
 
-    return data;
+        // DEBUG : combien de lignes ?
+        alert("CSV chargé, lignes : " + rows.length);
+
+        const data = rows.slice(1).map(row => {
+            const [code, lat, lng] = row.split(';'); // on lit bien les ;
+            return { code: code.trim(), lat: lat.trim(), lng: lng.trim() };
+        });
+
+        // DEBUG : première ligne
+        if (data.length > 0) {
+            alert("Premier code : " + data[0].code);
+        }
+
+        return data;
+    } catch (e) {
+        alert("Erreur JS : " + e.message);
+        return [];
+    }
 }
 
 async function searchSite() {
     const query = document.getElementById('search').value.trim().toUpperCase();
     const data = await loadCSV();
 
+    if (!data || data.length === 0) {
+        alert("Aucune donnée chargée depuis sites.csv");
+        return;
+    }
+
     const result = data.find(item => item.code.toUpperCase() === query);
 
     if (!result) {
-        alert("Code introuvable");
+        alert("Code introuvable dans le CSV : " + query);
         return;
     }
 
