@@ -7,6 +7,17 @@
     body { font-family: Arial; padding: 20px; }
     input { width: 300px; padding: 10px; font-size: 16px; }
     button { padding: 10px 20px; font-size: 16px; }
+    #result a { 
+        display: inline-block; 
+        margin-right: 20px; 
+        margin-top: 10px; 
+        padding: 10px 15px; 
+        background: #eee; 
+        border-radius: 6px; 
+        text-decoration: none; 
+        color: #000;
+        font-size: 14px;
+    }
 </style>
 </head>
 <body>
@@ -15,7 +26,7 @@
 <input type="text" id="search" placeholder="Ex : 050BNO">
 <button onclick="searchSite()">Chercher</button>
 
-<!-- Zone où les icônes vont s'afficher -->
+<!-- Zone où les liens vont s'afficher -->
 <div id="result" style="margin-top:20px;"></div>
 
 <script>
@@ -26,7 +37,7 @@ async function loadCSV() {
     const rows = text.split('\n').map(r => r.trim()).filter(r => r.length > 0);
 
     const data = rows.slice(1).map(row => {
-        const [code, lat, lng] = row.split(';');
+        const [code, lat, lng] = row.split(';'); // si ton fichier est avec ;
         return { code: code.trim(), lat: lat.trim(), lng: lng.trim() };
     });
 
@@ -41,24 +52,21 @@ async function searchSite() {
 
     if (!result) {
         alert("Code introuvable");
+        document.getElementById("result").innerHTML = "";
         return;
     }
 
-    // URLs pour ouvrir les apps
     const mapsUrl = `https://www.google.com/maps?q=${result.lat},${result.lng}`;
     const wazeUrl = `https://waze.com/ul?ll=${result.lat},${result.lng}&navigate=yes`;
 
-    // Affichage des icônes (PNG compatibles mobile)
+    // 1) Comme avant : on ouvre directement Google Maps
+    window.open(mapsUrl, "_blank");
+
+    // 2) En plus : on affiche deux liens cliquables
     document.getElementById("result").innerHTML = `
         <p>Choisir l'application :</p>
-
-        <a href="${mapsUrl}" target="_blank" style="margin-right:20px;">
-            <img src="https://i.imgur.com/4ZQZ4Zy.png" width="60">
-        </a>
-
-        <a href="${wazeUrl}" target="_blank">
-            <img src="https://i.imgur.com/1n7fZQk.png" width="60">
-        </a>
+        <a href="${mapsUrl}" target="_blank">Ouvrir dans Google Maps</a>
+        <a href="${wazeUrl}" target="_blank">Ouvrir dans Waze</a>
     `;
 }
 </script>
