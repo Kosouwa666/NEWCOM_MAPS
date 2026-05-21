@@ -6,7 +6,7 @@
 <style>
     body { font-family: Arial; padding: 20px; }
     input { width: 300px; padding: 10px; font-size: 16px; }
-    button { padding: 10px 20px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; margin-left: 10px; }
 
     #result a { 
         display: inline-block; 
@@ -23,7 +23,7 @@
     /* Style du menu déroulant */
     #suggestions {
         border: 1px solid #ccc;
-        max-width: 300px;
+        width: 300px;
         display: none;
         position: absolute;
         background: white;
@@ -36,18 +36,27 @@
     #suggestions div:hover {
         background: #f0f0f0;
     }
+
+    /* Conteneur horizontal */
+    .search-container {
+        display: flex;
+        align-items: flex-start;
+        position: relative;
+    }
 </style>
 </head>
 <body>
 
 <h2>Recherche de site</h2>
 
-<div style="position:relative;">
-    <input type="text" id="search" placeholder="Ex : 050BNO">
-    <div id="suggestions"></div>
-</div>
+<div class="search-container">
+    <div style="position:relative;">
+        <input type="text" id="search" placeholder="Ex : 050BNO">
+        <div id="suggestions"></div>
+    </div>
 
-<button onclick="searchSite()">Chercher</button>
+    <button onclick="searchSite()">Chercher</button>
+</div>
 
 <div id="result" style="margin-top:20px;"></div>
 
