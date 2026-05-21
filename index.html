@@ -29,6 +29,14 @@
 <div id="result" style="margin-top:20px;"></div>
 
 <script>
+// Empêche la touche Entrée d'ouvrir automatiquement Maps
+document.getElementById("search").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        searchSite();
+    }
+});
+
 // Lecture du CSV
 async function loadCSV() {
     const response = await fetch('sites.csv');
@@ -59,7 +67,6 @@ async function searchSite() {
     const mapsUrl = `https://www.google.com/maps?q=${result.lat},${result.lng}`;
     const wazeUrl = `https://waze.com/ul?ll=${result.lat},${result.lng}&navigate=yes`;
 
-    // Aucun lancement automatique → seulement les choix
     document.getElementById("result").innerHTML = `
         <p>Choisir l'application :</p>
         <a href="${mapsUrl}" target="_blank" style="background:#4285F4;color:white;">
