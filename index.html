@@ -34,7 +34,7 @@ async function searchSite() {
     const query = document.getElementById('search').value.trim().toUpperCase();
     const data = await loadCSV();
 
-    const result = data.find(item => item.code === query);
+    const result = data.find(item => item.code.toUpperCase() === query);
 
     if (!result) {
         alert("Code introuvable");
