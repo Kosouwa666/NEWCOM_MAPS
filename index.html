@@ -7,6 +7,7 @@
     body { font-family: Arial; padding: 20px; }
     input { width: 300px; padding: 10px; font-size: 16px; }
     button { padding: 10px 20px; font-size: 16px; }
+
     #result a { 
         display: inline-block; 
         margin-right: 20px; 
@@ -18,12 +19,34 @@
         color: #000;
         font-weight: bold;
     }
+
+    /* Style du menu déroulant */
+    #suggestions {
+        border: 1px solid #ccc;
+        max-width: 300px;
+        display: none;
+        position: absolute;
+        background: white;
+        z-index: 10;
+    }
+    #suggestions div {
+        padding: 8px;
+        cursor: pointer;
+    }
+    #suggestions div:hover {
+        background: #f0f0f0;
+    }
 </style>
 </head>
 <body>
 
 <h2>Recherche de site</h2>
-<input type="text" id="search" placeholder="Ex : 050BNO">
+
+<div style="position:relative;">
+    <input type="text" id="search" placeholder="Ex : 050BNO">
+    <div id="suggestions"></div>
+</div>
+
 <button onclick="searchSite()">Chercher</button>
 
 <div id="result" style="margin-top:20px;"></div>
@@ -49,6 +72,37 @@ async function loadCSV() {
     });
 
     return data;
+}
+
+// AUTO-COMPLÉTION
+document.getElementById("search").addEventListener("input", async function() {
+    const query = this.value.trim().toUpperCase();
+    const suggestionsBox = document.getElementById("suggestions");
+
+    if (query.length < 2) {
+        suggestionsBox.style.display = "none";
+        return;
+    }
+
+    const data = await loadCSV();
+    const matches = data.filter(item => item.code.includes(query));
+
+    if (matches.length === 0) {
+        suggestionsBox.style.display = "none";
+        return;
+    }
+
+    suggestionsBox.innerHTML = matches
+        .map(item => `<div onclick="selectSuggestion('${item.code}')">${item.code}</div>`)
+        .join("");
+
+    suggestionsBox.style.display = "block";
+});
+
+// Quand on clique sur une suggestion
+function selectSuggestion(code) {
+    document.getElementById("search").value = code;
+    document.getElementById("suggestions").style.display = "none";
 }
 
 // Recherche + affichage des boutons
