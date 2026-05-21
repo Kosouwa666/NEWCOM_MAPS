@@ -66,14 +66,18 @@ async function searchSite() {
     document.getElementById("result").innerHTML = `
     <p>Choisir l'application :</p>
 
-    <a href="${mapsUrl}" target="_blank" 
-       style="display:inline-block;padding:12px 20px;background:#4285F4;color:white;border-radius:6px;margin-right:15px;text-decoration:none;">
-       Google Maps
+    <a href="${mapsUrl}" target="_blank"
+       style="display:inline-block;padding:12px 18px;margin-right:15px;
+              background:#4285F4;color:white;border-radius:6px;
+              text-decoration:none;font-weight:bold;">
+        Ouvrir dans Google Maps
     </a>
 
-    <a href="${wazeUrl}" target="_blank" 
-       style="display:inline-block;padding:12px 20px;background:#1C9CEA;color:white;border-radius:6px;text-decoration:none;">
-       Waze
+    <a href="${wazeUrl}" target="_blank"
+       style="display:inline-block;padding:12px 18px;
+              background:#1C9CEA;color:white;border-radius:6px;
+              text-decoration:none;font-weight:bold;">
+        Ouvrir dans Waze
     </a>
 `;
 }
