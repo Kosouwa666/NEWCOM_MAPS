@@ -22,7 +22,6 @@
         font-size: 16px;
     }
 
-    /* Style du menu déroulant */
     #suggestions {
         border: 1px solid #ccc;
         width: 300px;
@@ -40,34 +39,10 @@
         background: #f0f0f0;
     }
 
-    /* Conteneur horizontal */
     .search-container {
         display: flex;
         align-items: flex-start;
         position: relative;
-    }
-
-    /* 📱 VERSION MOBILE : texte 2× plus grand */
-    @media (max-width: 600px) {
-        input {
-            width: 100%;
-            font-size: 28px;
-            padding: 16px;
-        }
-        button {
-            font-size: 26px;
-            padding: 16px 24px;
-        }
-        #suggestions {
-            font-size: 26px;
-        }
-        #result a {
-            font-size: 26px;
-            padding: 18px 26px;
-        }
-        h2 {
-            font-size: 32px;
-        }
     }
 </style>
 </head>
@@ -87,7 +62,7 @@
 <div id="result" style="margin-top:20px;"></div>
 
 <script>
-// Empêche la touche Entrée d'ouvrir automatiquement Maps
+// Empêche Enter de lancer Maps
 document.getElementById("search").addEventListener("keydown", function(e) {
     if (e.key === "Enter") {
         e.preventDefault();
@@ -95,21 +70,23 @@ document.getElementById("search").addEventListener("keydown", function(e) {
     }
 });
 
-// Lecture du CSV
+// Lecture du CSV (robuste)
 async function loadCSV() {
     const response = await fetch('sites.csv');
     const text = await response.text();
-    const rows = text.split('\n').map(r => r.trim()).filter(r => r.length > 0);
 
-    const data = rows.slice(1).map(row => {
-        const [code, lat, lng] = row.split(';');
-        return { code: code.trim(), lat: lat.trim(), lng: lng.trim() };
-    });
-
-    return data;
+    return text
+        .split('\n')
+        .map(r => r.trim())
+        .filter(r => r.length > 0)
+        .slice(1)
+        .map(row => {
+            const parts = row.split(';').map(x => x.trim());
+            return { code: parts[0], lat: parts[1], lng: parts[2] };
+        });
 }
 
-// AUTO-COMPLÉTION
+// AUTO-COMPLÉTION (recherche partielle)
 document.getElementById("search").addEventListener("input", async function() {
     const query = this.value.trim().toUpperCase();
     const suggestionsBox = document.getElementById("suggestions");
@@ -134,36 +111,58 @@ document.getElementById("search").addEventListener("input", async function() {
     suggestionsBox.style.display = "block";
 });
 
-// Quand on clique sur une suggestion
+// Sélection d’une suggestion
 function selectSuggestion(code) {
     document.getElementById("search").value = code;
     document.getElementById("suggestions").style.display = "none";
-    searchSite(); // Lance automatiquement la recherche
+    searchSite();
 }
 
-// Recherche + affichage des boutons
+// RECHERCHE (partielle + exacte)
 async function searchSite() {
     const query = document.getElementById('search').value.trim().toUpperCase();
     const data = await loadCSV();
 
-    const result = data.find(item => item.code.toUpperCase() === query);
+    // 1) Recherche exacte
+    const exact = data.find(item => item.code === query);
 
-    if (!result) {
-        alert("Code introuvable");
-        document.getElementById("result").innerHTML = "";
+    if (exact) {
+        openMaps(exact);
         return;
     }
 
-    const mapsUrl = `https://www.google.com/maps?q=${result.lat},${result.lng}`;
-    const wazeUrl = `https://waze.com/ul?ll=${result.lat},${result.lng}&navigate=yes`;
+    // 2) Recherche partielle
+    const matches = data.filter(item => item.code.includes(query));
+
+    if (matches.length === 0) {
+        document.getElementById("result").innerHTML = "<p>Aucun site trouvé.</p>";
+        return;
+    }
+
+    // Affichage liste des résultats
+    document.getElementById("result").innerHTML =
+        "<p>Résultats :</p>" +
+        matches.map(item =>
+            `<div style="margin:8px 0;">
+                <a href="#" onclick="openMaps({lat:'${item.lat}',lng:'${item.lng}'})">
+                    ${item.code}
+                </a>
+            </div>`
+        ).join("");
+}
+
+// Ouvre Maps/Waze
+function openMaps(item) {
+    const mapsUrl = `https://www.google.com/maps?q=${item.lat},${item.lng}`;
+    const wazeUrl = `https://waze.com/ul?ll=${item.lat},${item.lng}&navigate=yes`;
 
     document.getElementById("result").innerHTML = `
         <p>Choisir l'application :</p>
         <a href="${mapsUrl}" target="_blank" style="background:#4285F4;color:white;">
-            Ouvrir dans Google Maps
+            Google Maps
         </a>
         <a href="${wazeUrl}" target="_blank" style="background:#1C9CEA;color:white;">
-            Ouvrir dans Waze
+            Waze
         </a>
     `;
 }
